@@ -28,4 +28,3 @@ Delete a task:
 Edit a task:
 - `$> !ed [taskid]`
 - `$> !edit [taskid]`
-- `$> ![taskid]`
