@@ -1,0 +1,2 @@
+TASK_MAX_LENGTH = 80
+STATE_FILENAME = "_state.json"
