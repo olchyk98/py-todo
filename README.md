@@ -11,21 +11,21 @@ To do other stuff, like deleting or editing you will need to use "!"
 ## Commands
 
 Get help:
-`$> !`
-`$> !?`
-`$> !help`
+- `$> !`
+- `$> !?`
+- `$> !help`
 
 Refresh the list of tasks:
-`$> !see`
-`$> !list`
-`$> !todo`
-`$> !tasks`
+- `$> !see`
+- `$> !list`
+- `$> !todo`
+- `$> !tasks`
 
 Delete a task:
-`$> !del [taskid]`
-`$> !delete [taskid]`
+- `$> !del [taskid]`
+- `$> !delete [taskid]`
 
 Edit a task:
-`$> !ed [taskid]`
-`$> !edit [taskid]`
-`$> ![taskid]`
+- `$> !ed [taskid]`
+- `$> !edit [taskid]`
+- `$> ![taskid]`
