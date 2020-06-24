@@ -12,7 +12,7 @@ if __name__ != "__main__":
 	raise Exception("This application file cannot be a part of another app.");
 #
 
-# Get the last saved state
+# Get last saved state
 state = StateManager("_state.json")
 
 # Display created tasks 
