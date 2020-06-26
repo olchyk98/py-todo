@@ -65,6 +65,24 @@ class StateManager():
         
         self.write_state(self.state)
     
+    def remove_task(self, index):
+        try:
+            self.state["tasks"].pop(index)
+        except:
+            return "Something is wrong. Could notdelete this task (id: %s)." % index + 1
+        
+        self.write_state(self.state)
+        
+    def edit_task(self, index, content):
+        try:
+            body = self.state["tasks"][index]
+            body["message"] = content
+        except:
+            return "Something is wrong. Could not edit this task (id: %s)." % index + 1
+        
+        self.write_state(self.state)
+        
+    
     # Getters
     def getState(self):
         return self.state

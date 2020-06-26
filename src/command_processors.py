@@ -1,5 +1,8 @@
 from constants import TASK_MAX_LENGTH
 import string
+from readchar import readkey
+
+ERR_INVALID_TODO_ID = "Invalid todo id"
 
 def process_stdin():
     command = input("> ");
@@ -27,19 +30,21 @@ def process_command(state, display_screen):
         if(not validContent):
             return display_screen(state, "Cannot create an empty task.")
     
+        fnerror = None
+    
         if(cinfo["is_command"]):
             #
             args = cinfo["content"].split(" ")
             head = args.pop(0)
             #
-            if(head not in COMMAND_PROCESSORS):
+            if(head not in commandsManager.getHeads()):
                 # Create a error message
                 error_str = "Invalid command: '%s' | Type '!?' to get help..." % (
-                    head[:1]
+                    head
                 )
                 # Display all tasks and prompt again & break the function
                 return display_screen(state, error_str)
-            COMMAND_PROCESSORS[head](args, state)
+            fnerror = commandsManager.getCommandBody(head)['executor'](args, state)
             pass
         else: # Add a new task
             contentlen = len(cinfo["content"])
@@ -54,35 +59,127 @@ def process_command(state, display_screen):
             
             state.add_task(cinfo["content"])
         
-        display_screen(state)
+        display_screen(state, fnerror)
 #------------------------------------------------------------------#
 
-
-# def display_help():
-#     pass
+def display_help(args, state):
+    commands = commandsManager.getCommands()
+    
+    for item in commands:
+        print("%s : %s" % (item['callers'][0], item['description']))
+        for caller in item['callers']:
+            print(' - %s' % caller)
+            
+    print("Press any key to continue...")
+    readkey()
 
 def display_screen(args, state):
     # DO NOT IMPLEMENT
     # process_command() function executes display_utils.display_screen() after command_processors.display_screen()
     pass
 
-COMMAND_PROCESSORS = {
-    # Display Help
-    # "!": display_help,   
-    # "!?": display_help,   
-    # "!help": display_help,
+def delete_task(args, state):
+    if(len(args) == 0): return "You should pass the [id] argument"
     
-    # Refresh the list of tasks
-    "!see": display_screen,
-    "!list": display_screen,
-    "!todo": display_screen,
-    "!tasks": display_screen,
+    try:
+        index = int(args[0]) - 1
+    except:
+        return ERR_INVALID_TODO_ID
     
-    # Delete a task
-    # "!del": delete_task,
-    # "!delete": delete_task,
+    err = state.remove_task(index)
     
-    # Edit a task
-    # "!ed": edit_task,
-    # "!edit": edit_task
-}
+    if(err): return err
+    
+def edit_task(args, state):
+    if(len(args) == 0): return "You should pass the [id] argument"
+    
+    try:
+        index = int(args[0]) - 1
+    except:
+        return ERR_INVALID_TODO_ID
+    
+    if(len(state.getState()['tasks']) - 1 < index):
+        return ERR_INVALID_TODO_ID
+
+    content = input("New name: ")
+    contentlen = len(content)
+            
+    if(contentlen > TASK_MAX_LENGTH):
+        return "Task is too log. The content should be at least %s characters shorter" % (
+            TASK_MAX_LENGTH - contentlen
+        )
+    
+    err = state.edit_task(index, content)
+    
+    if(err): return err
+    
+
+#------------------------------------------------------------------#
+
+class CommandsManager():
+    def __init__(self):
+        self.commands = [
+            {
+                "executor": display_screen,
+                "callers": [
+                    "!see",
+                    "!list",
+                    "!todo",
+                    "!tasks"
+                ],
+                "description": "Displays the todo list"
+            },
+            {
+                "executor": delete_task,
+                "callers": [
+                    "!del",
+                    "!delete"
+                ],
+                "description": "Deletes a task. Takes one argument: [id]"
+            },
+            {
+                "executor": display_help,
+                "callers": [
+                    "!",
+                    "!?",
+                    "!help"
+                ],
+                "description": "Display this list of commands"
+            },
+            {
+                "executor": edit_task,
+                "callers": [
+                    "!ed",
+                    "!edit"
+                ],
+                "description": "Opens an input field, so you will be able to change a task name. Takes one argument: [id]"
+            }
+        ]
+        
+    def getCommands(self):
+        return self.commands
+        
+    def getHeads(self):
+        commands = [];
+    
+        for item in self.commands:
+            commands = [
+                *commands,
+                *item["callers"]
+            ]
+        
+        return commands
+    
+    def getCommandBody(self, head):
+        body = None
+        
+        for item in self.commands:
+            if(head in item['callers']):
+                body = item
+                break
+        
+        if(not body):
+            raise Exception("Internal Program Error. Please, repport the incident")
+        return body
+        
+commandsManager = CommandsManager()
