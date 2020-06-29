@@ -1,6 +1,6 @@
 # py-todo
 
-Easy to use & fast console TODO application written on Python.
+Easy to use & fast console TODO application written in Python.
 
 ## Controls
 To add a new task just type the task and click enter.
